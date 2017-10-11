@@ -67,7 +67,7 @@ URI Structure:
 /api/geocode/v1.0/json - specifies the format of expected input/output. If for example, XML 
                          format would later be supported, on the last part of URI would need to change.
 
-At this point is hardcoded below, however proper versioning and multiple
+At this point URI is hardcoded below, however proper versioning and multiple
 format support is possible given the URI structure. 
 
 ************************************************************************************
@@ -79,7 +79,7 @@ format support is possible given the URI structure.
 import sys
 from flask import Flask, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
-from utils.cmd_reader import CommandLineReader
+from utils.cfg_reader import CommandLineReader, SafeConfigParserBuilder, ConfigLoader
 from utils.properties import PropertyFileLoader
 from utils.constants import SERVER_CONNECTION_INFO, HOST, PORT, USERNAME, PASSWORD, LOGIN_INFO
 from websvc.third_party_websvc import ServiceRunner    
@@ -87,14 +87,17 @@ from websvc.third_party_websvc import ServiceRunner
 URI = "/api/geocode/v1.0/json"
 
 '''
-Below variables ideally should be defind by Spring (or similar framework) and used 
-as part of dependency injection. This is a poor-man's version. 
+Below variables ideally should be defined by Spring (or similar framework). 
+This is a poor-man's version. Currently it is here because it's used for 
+dependency injection. 
 '''
 app = Flask(__name__)
 auth = HTTPBasicAuth()
 prop_loader = PropertyFileLoader()
-cmd_reader = CommandLineReader(prop_loader)
-geosvc = ServiceRunner()
+cmd_reader = CommandLineReader()
+svc_runner = ServiceRunner()
+parser_builder = SafeConfigParserBuilder()
+config_loader = ConfigLoader(prop_loader, parser_builder)
 
 
 
@@ -116,7 +119,7 @@ Returns: json formated message.
 @auth.login_required
 def get_address():
     address = request.args.get('address', default = '', type = str)
-    results = geosvc.run_service(address)
+    results = svc_runner.run_service(address)
     
     return jsonify({'results': results})
 
@@ -144,25 +147,35 @@ service.
 '''
 @auth.get_password
 def get_password(username):
-    if username == cmd_reader.local_svc_props[LOGIN_INFO][USERNAME]:
-        return cmd_reader.local_svc_props[LOGIN_INFO][PASSWORD]
+    login_info = config_loader.local_svc_props[LOGIN_INFO]
+    
+    if username == login_info[USERNAME]:
+        return login_info[PASSWORD]
+    
     return None
 
 '''
-Authorisation error handler. Returns code 401
+Authorization error handler. Returns code 401
 '''
 @auth.error_handler
 def unauthorized():
     return make_response(jsonify({'error': 'Unauthorized access'}), 401)
 
-
 '''
-Service starts here. Reads command line arguments, loads the properties and 
-starts the service.
+starts the application
 '''
-if __name__ == '__main__':
+def start_app():
+    #read command line arguments
     cmd_reader.read_command_line(sys.argv[1:])
-    geosvc.third_party_props = cmd_reader.third_pty_props
     
-    app.run(host=cmd_reader.local_svc_props[SERVER_CONNECTION_INFO][HOST], port=cmd_reader.local_svc_props[SERVER_CONNECTION_INFO][PORT])
+    #load and set configs
+    config_loader.load_configs(cmd_reader.local_svc_cfg_file, cmd_reader.third_pty_cfg_file)
+    svc_runner.third_party_props = config_loader.third_pty_props
+    
+    #start the application
+    server_info = config_loader.local_svc_props[SERVER_CONNECTION_INFO]
+    app.run(host=server_info[HOST], port=server_info[PORT])
+    
+if __name__ == '__main__':
+    start_app()
     
