@@ -4,12 +4,12 @@ Created on Oct 10, 2017
 This module contains classes required for reading of the config files and command line inputs.
 
 
-SafeConfigParserBuilder:
- - builds a SafeConfigParser. This is used for dependency injection to make testing easier
+ConfigParserBuilder:
+ - builds a ConfigParser. This is used for dependency injection to make testing easier
  
 ConfigLoader: 
  - reads and loads ini files for local and 3rd party configuration 
- - uses SafeConfigParserBuilder
+ - uses ConfigParserBuilder
 
 CommandLineReader:
  - Responsible for reading and parsing command line input. If the input is not valid, 
@@ -18,10 +18,9 @@ CommandLineReader:
 @author: Dounaa
 '''
 
-import argparse
 import logging
 import sys
-from configparser import SafeConfigParser
+from configparser import ConfigParser
 
 class ConfigLoader(object):
     '''
@@ -47,7 +46,7 @@ class ConfigLoader(object):
 
     # Constructor
     # prop_file_loader - responsible for reading properties. Should be of type properties.PropertyFileLoader
-    # config_parser_builder - builds ConfigParser. should be of type SafeConfigParserBuilder
+    # config_parser_builder - builds ConfigParser. should be of type ConfigParserBuilder
     def __init__(self, prop_file_loader, config_parser_builder):
         self._prop_file_loader = prop_file_loader
         self._config_parser_builder = config_parser_builder
@@ -65,13 +64,13 @@ class ConfigLoader(object):
         
         logging.info("Configs successfully loaded")
 
-class SafeConfigParserBuilder(object):
+class ConfigParserBuilder(object):
     '''
     Just constructs SafeConfigParser. This class exists only to help with testing via DI
     '''
     
     def build(self):
-        return SafeConfigParser()
+        return ConfigParser()
 
 
 class CommandLineReader(object):
@@ -79,7 +78,12 @@ class CommandLineReader(object):
     CommandLineReader is responsible for reading and parsing command line input.
     If the input is not valid, or not all of the input criteria are met, the program exists.
     '''
-       
+    
+    #constructor. Takes in ArgumentParser
+    def __init__(self, argument_parser):    
+        self._argument_parser = argument_parser
+        
+        
     # full path to the webservice configuration file
     @property
     def local_svc_cfg_file(self):
@@ -92,18 +96,17 @@ class CommandLineReader(object):
     
     # reads command line arguments and sets properties if successful
     # exists the application if encounters errors
-    def read_command_line(self, argv):
+    def read_command_line(self, argument_parser):
         try:      
-            parser = argparse.ArgumentParser()
-            parser.add_argument("-l", type=str, help="ini file containing this service properties (host, port, etc)")
-            parser.add_argument("-t", type=str, help="ini file containing 3rd party geolocation provider properties")
+            self._argument_parser.add_argument("-l", type=str, help="ini file containing this service properties (host, port, etc)")
+            self._argument_parser.add_argument("-t", type=str, help="ini file containing 3rd party geolocation provider properties")
             
-            args = parser.parse_args()
+            args = self._argument_parser.parse_args()
             
             if(args.l and args.t):
                 self._third_pty_cfg_file = args.t
                 self._local_svc_cfg_file = args.l
             
         except:        
-            logging.error("Error occured. Please run with -h to see usage.")             
+            logging.error("Error occurred. Please run with -h to see usage.")             
             sys.exit(2)
