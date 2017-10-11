@@ -56,10 +56,10 @@ class ConfigLoader(object):
     # third_pty_cfg_file - 3rd party geolocation provider config file
     def load_configs(self, local_svc_cfg_file, third_pty_cfg_file):
         
-        self._local_props = self._prop_file_loader.read_properties(local_svc_cfg_file, self._config_parser_builder.build_parser())
+        self._local_props = self._prop_file_loader.read_properties(local_svc_cfg_file, self._config_parser_builder.build())
         print (self._local_props)
         
-        self._remote_props = self._prop_file_loader.read_properties(third_pty_cfg_file, self._config_parser_builder.build_parser())
+        self._remote_props = self._prop_file_loader.read_properties(third_pty_cfg_file, self._config_parser_builder.build())
         print (self._remote_props)
         
 
@@ -68,7 +68,7 @@ class SafeConfigParserBuilder(object):
     Just constructs SafeConfigParser. This class exists only to help with testing via DI
     '''
     
-    def build_parser(self):
+    def build(self):
         return SafeConfigParser()
 
 
