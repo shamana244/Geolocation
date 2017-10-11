@@ -55,16 +55,16 @@ class GeoLocService(object):
     #constructor
     def __init__(self, properties):
         
-        self.__properties = properties
+        self._properties = properties
         
     # constructs URL, sends the request and returns corresponding response as Json.
     # if no result is found, or an exception is caught, None is returned
     def call_service(self, address):
-        logging.info('Calling %s service...', self.__properties[SERVICE_NAME])
+        logging.info('Calling %s service...', self._properties[SERVICE_NAME])
         result = None
         
         #construct URL
-        svc_url = self.__properties[SERVICE_URL] + "?" + self.__properties[ID_STRING] + '&' + self.__properties[SEARCH_TAG]
+        svc_url = self._properties[SERVICE_URL] + "?" + self._properties[ID_STRING] + '&' + self._properties[SEARCH_TAG]
         full_url = svc_url + address
                       
         #issue call           
@@ -75,7 +75,7 @@ class GeoLocService(object):
             logging.debug(result)
             logging.info("...call succeeded")
         except Exception as e:
-            logging.warning('Error occurred calling %s service. Error: %s', self.__properties[SERVICE_NAME], str(e))
+            logging.warning('Error occurred calling %s service. Error: %s', self._properties[SERVICE_NAME], str(e))
         
         return result
 
