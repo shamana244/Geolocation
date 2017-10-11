@@ -77,6 +77,7 @@ format support is possible given the URI structure.
 
 #imports
 import sys
+import logging
 from flask import Flask, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
 from utils.cfg_reader import CommandLineReader, SafeConfigParserBuilder, ConfigLoader
@@ -163,6 +164,10 @@ def unauthorized():
 starts the application
 '''
 def start_app():
+    #setup logger
+    
+    logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
+    
     #read command line arguments
     cmd_reader.read_command_line(sys.argv[1:])
     

@@ -19,6 +19,7 @@ CommandLineReader:
 '''
 
 import argparse
+import logging
 import sys
 from configparser import SafeConfigParser
 
@@ -57,11 +58,12 @@ class ConfigLoader(object):
     def load_configs(self, local_svc_cfg_file, third_pty_cfg_file):
         
         self._local_props = self._prop_file_loader.read_properties(local_svc_cfg_file, self._config_parser_builder.build())
-        print (self._local_props)
+        logging.debug(self._local_props)
         
         self._remote_props = self._prop_file_loader.read_properties(third_pty_cfg_file, self._config_parser_builder.build())
-        print (self._remote_props)
+        logging.debug(self._remote_props)
         
+        logging.info("Configs successfully loaded")
 
 class SafeConfigParserBuilder(object):
     '''
@@ -103,5 +105,5 @@ class CommandLineReader(object):
                 self._local_svc_cfg_file = args.l
             
         except:        
-            print("Error occured. Please run with -h to see usage.")             
+            logging.error("Error occured. Please run with -h to see usage.")             
             sys.exit(2)

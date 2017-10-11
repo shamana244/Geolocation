@@ -38,11 +38,10 @@ ServiceResultProcessor:
 
 '''
 
-import sys
 import requests
+import logging
 
 from utils.constants import ID_STRING, SERVICE_URL, SEARCH_TAG, SERVICE_PROVIDER, LAT_JSON_PATH, LON_JSON_PATH, LATITUDE, LONGITUDE,SERVICE_NAME
-from utils.json_parser import JsonPathParser
 
 
 class GeoLocService(object):
@@ -61,7 +60,7 @@ class GeoLocService(object):
     # constructs URL, sends the request and returns corresponding response as Json.
     # if no result is found, or an exception is caught, None is returned
     def call_service(self, address):
-        print ('Calling %s service...' %self.__properties[SERVICE_NAME])
+        logging.info('Calling %s service...', self.__properties[SERVICE_NAME])
         result = None
         
         #construct URL
@@ -72,9 +71,11 @@ class GeoLocService(object):
         try:
             res = requests.get(full_url)
             result = res.json()
-            print(result)
-        except:
-            print('Error occurred calling %s service. Error: %s' % (self.__properties[SERVICE_NAME], sys.exc_info()))
+            
+            logging.debug(result)
+            logging.info("...call succeeded")
+        except Exception as e:
+            logging.warning('Error occurred calling %s service. Error: %s', self.__properties[SERVICE_NAME], str(e))
         
         return result
 
@@ -166,6 +167,7 @@ class ServiceResultProcessor(object):
     def process_service_json(self, json_document, service_properties):
         result = {}
         
+        logging.info("Parsing json document...")
         #get the expected json path
         lat_path = service_properties[LAT_JSON_PATH]
         lon_path = service_properties[LON_JSON_PATH]
@@ -180,11 +182,11 @@ class ServiceResultProcessor(object):
             result[LONGITUDE] = lon
             result[SERVICE_PROVIDER] = service_properties[SERVICE_NAME]
             
-            print('Service: %s, Lat: %s, Lon: %s' %(service_properties[SERVICE_NAME], lat, lon))
+            logging.info('Parsing succeeded: Service: %s, Lat: %s, Lon: %s', service_properties[SERVICE_NAME], lat, lon)
         
         #handle errors
-        except:
-            print('Encountered Json parsing error:', sys.exc_info())
+        except Exception as e:
+            logging.warning('Parsing failed: %s', str(e))
             result = None
         
         return result
