@@ -6,6 +6,8 @@
 ************************************************************************************
 ************************************* Hot to run ***********************************
 ************************************************************************************
+ Note: This service was developed using Python 3.6 
+ 
  To start the service please run: 
    websvc\app.py -t ..\config\3rd_party_svc.ini -l ..\config\local_svc.ini
  
