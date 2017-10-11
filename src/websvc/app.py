@@ -72,15 +72,21 @@ format support is possible given the URI structure.
 
 ************************************************************************************
 
+Logger: currently the configuration is hardcoded in this file. In real life, I would 
+to have multiple log files (one per environment: DEV, QA, PROD) that would be read and 
+loaded. I did not do this for this project as I deemed it to be out of scope.
+
 @author: Dounaa
 '''
 
 #imports
 import sys
 import logging
+import argparse
+
 from flask import Flask, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
-from utils.cfg_reader import CommandLineReader, SafeConfigParserBuilder, ConfigLoader
+from utils.cfg_reader import CommandLineReader, ConfigParserBuilder, ConfigLoader
 from utils.properties import PropertyFileLoader
 from utils.json_parser import JsonPathParser
 from utils.constants import SERVER_CONNECTION_INFO, HOST, PORT, USERNAME, PASSWORD, LOGIN_INFO
@@ -95,9 +101,9 @@ dependency injection.
 '''
 app = Flask(__name__)
 auth = HTTPBasicAuth()
-cmd_reader = CommandLineReader()
+cmd_reader = CommandLineReader(argparse.ArgumentParser())
 svc_runner = ServiceRunner(GeoLocServiceBuilder(), ServiceResultProcessor(JsonPathParser()))
-config_loader = ConfigLoader(PropertyFileLoader(),  SafeConfigParserBuilder())
+config_loader = ConfigLoader(PropertyFileLoader(),  ConfigParserBuilder())
 
 
 '''*********************************************************************************
@@ -164,18 +170,17 @@ def unauthorized():
 starts the application
 '''
 def start_app():
-    #setup logger
-    
+    # setup logger
     logging.basicConfig(format='%(levelname)s:%(message)s', level=logging.INFO)
     
-    #read command line arguments
+    # read command line arguments
     cmd_reader.read_command_line(sys.argv[1:])
     
-    #load and set configs
+    # load and set configs
     config_loader.load_configs(cmd_reader.local_svc_cfg_file, cmd_reader.third_pty_cfg_file)
     svc_runner.third_party_props = config_loader.third_pty_props
     
-    #start the application
+    # start the application
     server_info = config_loader.local_svc_props[SERVER_CONNECTION_INFO]
     app.run(host=server_info[HOST], port=server_info[PORT])
     
