@@ -1,19 +1,24 @@
 '''
 Created on Oct 9, 2017
 
+PropertyFileLoader is responsible for loading properties.
+Given a file path to an .ini file and a config parser, 
+PropertyFileLoader reads the file and loads the properties 
+into a dict. 
+
 @author: Dounaa
 '''
 
 class PropertyFileLoader(object):
-    '''
-    Loads property file for the service
-    '''
     
-    def __init__(self):
-        '''
-        Constructor
-        '''
-            
+    '''
+    Loads a property file.
+     - file_path: path to the properties (ini) file to load
+     - configParser: configParser to be used for loading. It is
+                     passed in every time in because one may want
+                     to separate configurations. It is not created
+                     inside the function for testing purposes.
+    '''        
     def read_properties(self, file_path, configParser):
         '''
         Returns properties that are read from file
@@ -23,21 +28,9 @@ class PropertyFileLoader(object):
         results = {}
         
         for section in configParser.sections():
-            results[section] = self.__load_config_section(section, configParser)
-
+            results[section] = {}
+            for option, value in configParser.items(section):
+                results[section][option] = value
+            
         return results
     
-    def __load_config_section(self, section, configParser):
-        '''
-        attempts to load the specified section in the config file
-        '''
-        dictionary = {}
-        
-        options = configParser.options(section)
-
-        for option in options:
-            dictionary[option] = configParser.get(section, option)
-            if dictionary[option] == -1:
-                raise ValueError("%s is not found in section %s" % (option, section) )
-        
-        return dictionary
