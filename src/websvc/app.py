@@ -63,9 +63,13 @@ URI Structure:
 /api/geocode           - allows the uri to support multiple different apis in the future, 
                          not just geocode
 /api/geocode/v1.0      - allows multiple versions to run in parallel. For example for 
-                         backwards compatibility. 
+                         backwards compatibility. See note below.
 /api/geocode/v1.0/json - specifies the format of expected input/output. If for example, XML 
                          format would later be supported, on the last part of URI would need to change.
+
+Note: fully RESTful apis honor discovery. However for the purposes of this project
+this seemed to me as a mute point. So if discovery is off the table, versioning is the
+next best accepted practice.
 
 At this point URI is hardcoded below, however proper versioning and multiple
 format support is possible given the URI structure. 
