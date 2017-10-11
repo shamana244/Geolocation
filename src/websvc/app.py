@@ -81,8 +81,9 @@ from flask import Flask, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
 from utils.cfg_reader import CommandLineReader, SafeConfigParserBuilder, ConfigLoader
 from utils.properties import PropertyFileLoader
+from utils.json_parser import JsonPathParser
 from utils.constants import SERVER_CONNECTION_INFO, HOST, PORT, USERNAME, PASSWORD, LOGIN_INFO
-from websvc.third_party_websvc import ServiceRunner    
+from websvc.third_party_websvc import ServiceRunner, GeoLocServiceBuilder, ServiceResultProcessor
 
 URI = "/api/geocode/v1.0/json"
 
@@ -93,12 +94,9 @@ dependency injection.
 '''
 app = Flask(__name__)
 auth = HTTPBasicAuth()
-prop_loader = PropertyFileLoader()
 cmd_reader = CommandLineReader()
-svc_runner = ServiceRunner()
-parser_builder = SafeConfigParserBuilder()
-config_loader = ConfigLoader(prop_loader, parser_builder)
-
+svc_runner = ServiceRunner(GeoLocServiceBuilder(), ServiceResultProcessor(JsonPathParser()))
+config_loader = ConfigLoader(PropertyFileLoader(),  SafeConfigParserBuilder())
 
 
 '''*********************************************************************************
