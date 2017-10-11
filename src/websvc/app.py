@@ -79,11 +79,10 @@ format support is possible given the URI structure.
 import sys
 from flask import Flask, jsonify, make_response, request
 from flask_httpauth import HTTPBasicAuth
-from geolocation.cmd_reader import CommandLineReader
-from geolocation.properties import PropertyFileLoader
-from websvc.third_party_websvc import ServiceRunner
-from websvc.constants import SERVER_CONNECTION_INFO, HOST, PORT, USERNAME, PASSWORD, LOGIN_INFO
-    
+from utils.cmd_reader import CommandLineReader
+from utils.properties import PropertyFileLoader
+from utils.constants import SERVER_CONNECTION_INFO, HOST, PORT, USERNAME, PASSWORD, LOGIN_INFO
+from websvc.third_party_websvc import ServiceRunner    
 
 URI = "/api/geocode/v1.0/json"
 

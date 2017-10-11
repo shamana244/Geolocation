@@ -41,7 +41,9 @@ class CommandLineReader(object):
             
             args = parser.parse_args()
             
-            self.load_configs(args.l, args.t)
+            if(args.l and args.t):
+                self.load_configs(args.l, args.t)
             
-        except:                     
+        except:        
+            print("Error occured. Please run with -h to see usage.")             
             sys.exit(2)

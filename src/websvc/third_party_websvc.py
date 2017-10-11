@@ -8,8 +8,8 @@ Created on Oct 9, 2017
 import sys
 import requests
 
-from websvc.constants import ID_STRING, SERVICE_URL, SEARCH_TAG, SERVICE_PROVIDER, LAT_JSON_PATH, LON_JSON_PATH, LATITUDE, LONGITUDE,SERVICE_NAME
-from geolocation.json_parser import JsonPathParser
+from utils.constants import ID_STRING, SERVICE_URL, SEARCH_TAG, SERVICE_PROVIDER, LAT_JSON_PATH, LON_JSON_PATH, LATITUDE, LONGITUDE,SERVICE_NAME
+from utils.json_parser import JsonPathParser
 
 
 class GeoLocService(object):
