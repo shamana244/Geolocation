@@ -77,7 +77,7 @@ class JsonPathParser(object):
                 return self._process_path(json_doc[path_element], path, path_index + 1, max_index)
         #exception caught means that the path specified is not in the json document. Raise error            
         except:  
-            raise JsonParsingException("Unable to find %s in document" %path_element)
+            raise JsonParsingException("Unable to find %s in document", path_element)
 
 '''
 Class that simply wraps Exception to signify that json document could not be parsed.
